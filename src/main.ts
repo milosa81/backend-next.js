@@ -12,6 +12,8 @@ async function bootstrap() {
 		.setVersion('1.0')
 		.addTag('Customers')
 		.addTag('CustomerTypes')
+		.addTag('Skus')
+		.addTag('Profile')
 		.build();
 	const document = SwaggerModule.createDocument(app, options);
 	SwaggerModule.setup('/api', app, document);

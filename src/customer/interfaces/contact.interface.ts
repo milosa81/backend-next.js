@@ -1,5 +1,3 @@
-import { IsString, IsEmail } from "class-validator";
-
 export interface Contact {
     readonly firstName: string;
     readonly lastName: string;

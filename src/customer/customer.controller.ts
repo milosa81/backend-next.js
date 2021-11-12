@@ -21,6 +21,6 @@ export class CustomerController {
 
     @Post()
     async create(@Body() customerDto: CustomerDto) {
-        this.customerService.create(customerDto);
+        return this.customerService.create(customerDto);
     }
 }

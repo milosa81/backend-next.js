@@ -8,7 +8,5 @@ export const CustomerSchema = new mongoose.Schema({
     kbo: { type: String, required: true },
     type: CustomerTypeSchema,
     address: AddressSchema,
-    contacts: [ContactSchema],
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
-}, { collection: 'Customer' });
+    contacts: [ContactSchema]
+}, { collection: 'Customer', timestamps:{} });
