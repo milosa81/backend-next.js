@@ -29,4 +29,12 @@ export class CustomerService {
     async findOne(customerId: string): Promise<Customer> {
         return await this.customerModel.findById(customerId);
     }
+
+    async update(customerId: string, customer: CustomerDto): Promise<Customer> {
+        return await this.customerModel.findOneAndUpdate({ _id: customerId }, { $set: customer }, {new: true});
+    }
+
+    async delete(customerId: string) {
+        return await this.customerModel.findByIdAndRemove(customerId);
+    }
 }

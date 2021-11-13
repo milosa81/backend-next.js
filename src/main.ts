@@ -12,8 +12,10 @@ async function bootstrap() {
 		.setVersion('1.0')
 		.addTag('Customers')
 		.addTag('CustomerTypes')
-		.addTag('Skus')
+		.addTag('Invoices')
+		.addTag('InvoiceStates')
 		.addTag('Profile')
+		.addTag('Skus')
 		.build();
 	const document = SwaggerModule.createDocument(app, options);
 	SwaggerModule.setup('/api', app, document);

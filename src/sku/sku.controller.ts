@@ -4,6 +4,7 @@ import { SkuDto } from "./dto/sku.dto";
 import { SkuService } from "./sku.service";
 import { Sku } from "./interfaces/sku.interface";
 import { ApiUseTags } from "@nestjs/swagger";
+import { QuerystringTransformPipe } from "../shared/pipes/querystring-transform-pipe";
 
 @ApiUseTags('Skus')
 @Controller('sku')
@@ -15,7 +16,7 @@ export class SkuController {
     }
 
     @Get()
-    async find(@Req() req, @Query() parameters: SkuSearchParamsDto): Promise<Sku[]> {
+    async find(@Req() req, @Query(new QuerystringTransformPipe()) parameters: SkuSearchParamsDto): Promise<Sku[]> {
         return this.skuService.find(parameters, req.res);
     }
 
