@@ -2,8 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ApplicationModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { Migrator } from './migrations/migrator';
 
 async function bootstrap() {
+	var migrator = new Migrator();
+	migrator.migrate();
+
 	const app = await NestFactory.create(ApplicationModule);
 
 	const options = new DocumentBuilder()

@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Component } from '@nestjs/common';
+import { Component, HttpStatus } from '@nestjs/common';
 import { Sku } from "./interfaces/sku.interface";
 import { SkuDto } from './dto/sku.dto';
 import { SkuSchema } from './schema/sku.schema';
@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { QueryHelpers } from '../shared/helpers/query-helpers';
 import { SkuSearchParamsDto } from './dto/sku-search-params.dto';
 import { ServerResponse } from 'http';
+import { CustomError } from '../shared/exceptions/custom-error';
 
 @Component()
 export class SkuService {
@@ -18,11 +19,15 @@ export class SkuService {
     }
 
     async update(skuId: string, sku: SkuDto): Promise<Sku> {
-        return await this.skuModel.findOneAndUpdate({ _id: skuId }, { $set: sku }, {new: true});
+        var dbSku = await this.skuModel.findOneAndUpdate({ _id: skuId }, { $set: sku }, {new: true}).exec();
+        if(!dbSku) {
+            throw new CustomError('Sku with given id was not found', HttpStatus.NOT_FOUND);
+        }
+        return dbSku;
     }
 
     async delete(skuId: string) {
-        return await this.skuModel.findByIdAndRemove(skuId);
+        await this.skuModel.findByIdAndRemove(skuId).exec();
     }
 
     async find(parameters: SkuSearchParamsDto, res: ServerResponse): Promise<Sku[]> {
@@ -35,6 +40,6 @@ export class SkuService {
     }
 
     async findOne(skuId: string): Promise<Sku> {
-        return await this.skuModel.findById(skuId);
+        return await this.skuModel.findById(skuId).exec();
     }
 }

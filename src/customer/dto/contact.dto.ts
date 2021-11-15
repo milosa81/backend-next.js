@@ -21,4 +21,9 @@ export class ContactDto {
     @IsString()
     @IsNotEmpty()
     readonly phone: string;
+
+    @ApiModelProperty({ required: false })
+    @IsOptional()
+    @IsEmail()
+    readonly info?: string;
 }

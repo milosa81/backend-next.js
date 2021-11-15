@@ -14,6 +14,7 @@ import * as fs from 'fs';
 import * as pdf from 'dynamic-html-pdf';
 import * as Handlebars from 'handlebars';
 import { Response } from 'express';
+import { CustomError } from '../shared/exceptions/custom-error';
 
 @Component()
 export class InvoiceService {
@@ -37,51 +38,47 @@ export class InvoiceService {
     }
 
     async findOne(invoiceId: string): Promise<Invoice> {
-        return await this.invoiceModel.findById(invoiceId);
+        return await this.invoiceModel.findById(invoiceId).exec();
     }
 
     async update(invoiceId: string, invoice: InvoiceDto): Promise<Invoice> {
-        return await this.invoiceModel.findOneAndUpdate({ _id: invoiceId }, { $set: invoice }, { new: true });
+        var dbInvoice = await this.invoiceModel.findByIdAndUpdate(invoiceId, { $set: invoice }, { new: true }).exec();
+        if (!dbInvoice) {
+            throw new CustomError('Invoice with given id was not found', HttpStatus.NOT_FOUND);
+        }
+        return dbInvoice;
     }
 
-    async generateInvoice(invoiceId: string, res: Response) {
-        await this.invoiceModel.findById(invoiceId).exec()
-            .then(invoice => {
-                return this.profileModel.find().exec()
-                    .then(profile => {
-                        return [invoice, profile]
-                    });
-            })
-            .then(result => {
-                if (result[0] === null || result[1] === null) {
-                    throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    async generateInvoice(invoiceId: string, res: Response): Promise<void> {
+        var dbInvoice = await this.invoiceModel.findById(invoiceId).exec();
+        var dbProfile = await this.profileModel.find().exec();
+        if (!dbInvoice) {
+            throw new CustomError('Could not load invoice with given id', HttpStatus.NOT_FOUND);
+        }
+        if (!dbProfile) {
+            throw new CustomError('Could not load profile', HttpStatus.NOT_FOUND);
+        }
+        var template = fs.readFileSync(__dirname + '/templates/invoice-template.html', 'utf8');
+        var options = {
+            format: 'A4',
+            orientation: 'portrait',
+            border: '10mm'
+        };
+        var document = {
+            type: 'buffer',
+            template: template,
+            context: {
+                data: {
+                    invoice: dbInvoice,
+                    profile: dbProfile[0]
                 }
-                else {
-                    var template = fs.readFileSync(__dirname + '/templates/invoice-template.html', 'utf8');
-                    var options = {
-                        format: 'A4',
-                        orientation: 'portrait',
-                        border: '10mm'
-                    };
-                    var document = {
-                        type: 'buffer',
-                        template: template,
-                        context: {
-                            data: {
-                                invoice: result[0] as Invoice,
-                                profile: result[1][0] as Profile
-                            }
-                        }
-                    };
+            }
+        };
 
-                    return pdf.create(document, options)
-                        .then((result) => {
-                            res.setHeader('Content-Disposition', 'attachment; filename="' + document.context.data.invoice.number + '.pdf"');
-                            res.setHeader('Content-type', 'application/pdf');
-                            return res.send(result);
-                        });
-                }
-            });
+        var doc = await pdf.create(document, options);
+        res.setHeader('Content-Disposition', 'attachment; filename="' + document.context.data.invoice.number + '.pdf"');
+        res.setHeader('Content-type', 'application/pdf');
+        res.send(doc);
     }
 }
 

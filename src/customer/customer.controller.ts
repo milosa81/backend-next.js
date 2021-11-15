@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Request, Param, Post, Body, Req, Put, Delete } from "@nestjs/common";
+import { Controller, Get, Query, Request, Param, Post, Body, Req, Put, Delete, HttpException } from "@nestjs/common";
 import { CustomerSearchParamsDto } from "./dto/customer-search-params.dto";
 import { CustomerDto } from "./dto/customer.dto";
 import { CustomerService } from "./customer.service";
@@ -9,29 +9,49 @@ import { QuerystringTransformPipe } from "../shared/pipes/querystring-transform-
 @ApiUseTags('Customers')
 @Controller('customer')
 export class CustomerController {
-    constructor(private readonly customerService: CustomerService){}
+    constructor(private readonly customerService: CustomerService) { }
     @Get()
     async find(@Req() req, @Query(new QuerystringTransformPipe()) parameters: CustomerSearchParamsDto): Promise<Customer[]> {
-        return this.customerService.find(parameters, req.res);
+        try {
+            return await this.customerService.find(parameters, req.res);
+        } catch (err) {
+            throw new HttpException(err.extraInfo, err.code);
+        }
     }
 
     @Get(':customerId')
     async findOne(@Param('customerId') customerId: string): Promise<Customer> {
-        return this.customerService.findOne(customerId);
+        try {
+            return await this.customerService.findOne(customerId);
+        } catch (err) {
+            throw new HttpException(err.extraInfo, err.code);
+        }
     }
 
     @Post()
     async create(@Body() customerDto: CustomerDto) {
-        return this.customerService.create(customerDto);
+        try {
+            return await this.customerService.create(customerDto);
+        } catch (err) {
+            throw new HttpException(err.extraInfo, err.code);
+        }
     }
 
-    @Put(':skuId')
+    @Put(':customerId')
     async update(@Param('customerId') customerId: string, @Body() customerDto: CustomerDto): Promise<CustomerDto> {
-        return this.customerService.update(customerId, customerDto);
+        try {
+            return await this.customerService.update(customerId, customerDto);
+        } catch (err) {
+            throw new HttpException(err.extraInfo, err.code);
+        }
     }
 
     @Delete(':customerId')
     async delete(@Param('customerId') customerId: string) {
-        this.customerService.delete(customerId);
+        try {
+            await this.customerService.delete(customerId);
+        } catch (err) {
+            throw new HttpException(err.extraInfo, err.code);
+        }
     }
 }

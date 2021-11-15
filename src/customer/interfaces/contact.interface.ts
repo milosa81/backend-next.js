@@ -3,4 +3,5 @@ export interface Contact {
     readonly lastName: string;
     readonly email?: string;
     readonly phone: string;
+    readonly info: string;
 }

@@ -1,20 +1,28 @@
-
 import { ApiUseTags, ApiImplicitParam } from "@nestjs/swagger";
-import { Controller, Get, Put, Body, Param } from "@nestjs/common";
+import { Controller, Get, Put, Body, Param, HttpException } from "@nestjs/common";
 import { ProfileDto } from "./dto/profile.dto";
 import { ProfileService } from "./profile.service";
+import { MongoIdValidationPipe } from "../shared/pipes/mongo-id-validation-pipe";
 
 @ApiUseTags('Profile')
 @Controller('profile')
 export class ProfileController {
-    constructor(private readonly profileService: ProfileService){}
+    constructor(private readonly profileService: ProfileService) { }
     @Get()
     async find(): Promise<ProfileDto> {
-        return this.profileService.findOne();
+        try {
+            return await this.profileService.findOne();
+        } catch (err) {
+            throw new HttpException(err.extraInfo, err.code);
+        }
     }
 
     @Put(':profileId')
-    async update(@Param('profileId') profileId: string, @Body() profileDto: ProfileDto): Promise<ProfileDto> {
-        return this.profileService.update(profileId, profileDto);
+    async update(@Param('profileId', new MongoIdValidationPipe()) profileId: string, @Body() profileDto: ProfileDto): Promise<ProfileDto> {
+        try {
+            return await this.profileService.update(profileId, profileDto);
+        } catch (err) {
+            throw new HttpException(err.extraInfo, err.code);
+        }
     }
 }

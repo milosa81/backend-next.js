@@ -7,8 +7,8 @@ import { InvoiceCustomerSearchParamsDto } from "./invoice-customer-search-params
 export class InvoiceSearchParamsDto {
     @ApiModelProperty({ required: false })
     @IsOptional()
-    @IsNumber()
-    readonly number?: string;
+    //@IsNumber()
+    readonly number?: number;
 
     @ApiModelProperty({ required: false })
     @IsOptional()
