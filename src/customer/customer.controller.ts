@@ -11,7 +11,7 @@ import { QuerystringTransformPipe } from "../shared/pipes/querystring-transform-
 export class CustomerController {
     constructor(private readonly customerService: CustomerService) { }
     @Get()
-    async find(@Req() req, @Query(new QuerystringTransformPipe()) parameters: CustomerSearchParamsDto): Promise<Customer[]> {
+    async find(@Req() req, @Query() parameters: CustomerSearchParamsDto): Promise<Customer[]> {
         try {
             return await this.customerService.find(parameters, req.res);
         } catch (err) {
