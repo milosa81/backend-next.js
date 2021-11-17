@@ -9,7 +9,7 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://developerx:test@127.0.0.1:27017/NGInvoicing'),
+    MongooseModule.forRoot(process.env.CONNECTIONSTRING),
     UserModule,
     AuthModule,
     CustomerModule,
