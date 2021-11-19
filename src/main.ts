@@ -23,7 +23,7 @@ async function bootstrap() {
 		.addTag('Skus')
 		.build();
 	const document = SwaggerModule.createDocument(app, options);
-	SwaggerModule.setup('/api', app, document);
+	SwaggerModule.setup('/swagger', app, document);
 
 	app.useGlobalPipes(new QuerystringTransformPipe());
 	app.useGlobalPipes(new ValidationPipe());

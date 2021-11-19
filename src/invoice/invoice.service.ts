@@ -50,35 +50,39 @@ export class InvoiceService {
     }
 
     async generateInvoice(invoiceId: string, res: Response): Promise<void> {
-        var dbInvoice = await this.invoiceModel.findById(invoiceId).exec();
-        var dbProfile = await this.profileModel.find().exec();
-        if (!dbInvoice) {
-            throw new CustomError('Could not load invoice with given id', HttpStatus.NOT_FOUND);
-        }
-        if (!dbProfile) {
-            throw new CustomError('Could not load profile', HttpStatus.NOT_FOUND);
-        }
-        var template = fs.readFileSync(__dirname + '/templates/invoice-template.html', 'utf8');
-        var options = {
-            format: 'A4',
-            orientation: 'portrait',
-            border: '10mm'
-        };
-        var document = {
-            type: 'buffer',
-            template: template,
-            context: {
-                data: {
-                    invoice: dbInvoice,
-                    profile: dbProfile[0]
-                }
+        try{
+            var dbInvoice = await this.invoiceModel.findById(invoiceId).exec();
+            var dbProfile = await this.profileModel.find().exec();
+            if (!dbInvoice) {
+                throw new CustomError('Could not load invoice with given id', HttpStatus.NOT_FOUND);
             }
-        };
+            if (!dbProfile) {
+                throw new CustomError('Could not load profile', HttpStatus.NOT_FOUND);
+            }
+            var template = fs.readFileSync(__dirname + '/templates/invoice-template.html', 'utf8');
+            var options = {
+                format: 'A4',
+                orientation: 'portrait',
+                border: '10mm'
+            };
+            var document = {
+                type: 'buffer',
+                template: template,
+                context: {
+                    data: {
+                        invoice: dbInvoice,
+                        profile: dbProfile[0]
+                    }
+                }
+            };
 
-        var doc = await pdf.create(document, options);
-        res.setHeader('Content-Disposition', 'attachment; filename="' + document.context.data.invoice.number + '.pdf"');
-        res.setHeader('Content-type', 'application/pdf');
-        res.send(doc);
+            var doc = await pdf.create(document, options);
+            res.setHeader('Content-Disposition', 'attachment; filename="' + document.context.data.invoice.number + '.pdf"');
+            res.setHeader('Content-type', 'application/pdf');
+            res.send(doc);
+        }catch(err){
+            console.log(err);
+        }
     }
 }
 
