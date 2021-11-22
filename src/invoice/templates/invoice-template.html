@@ -8,6 +8,7 @@
         html,
         body {
             height: 100%;
+            font-size: 65%;
         }
 
         .top-space {
@@ -19,13 +20,13 @@
 <body>
     <div class="container" style="height: 100%;">
         <div class="row top-space">
-            <span style="font-weight: bold; font-size: large;">Factuur</span>
+            <span style="font-weight: bold; font-size: small;">Factuur</span>
         </div>
         <div class="row top-space">
             <div class="col-xs-4">
                 Leverancier:
                 <br/>
-                <span style="font-weight: bold; font-size: large;">{{this.data.profile.name}}</span>
+                <span style="font-weight: bold; font-size: small;">{{this.data.profile.name}}</span>
                 <br/>
                 <span>{{this.data.profile.address.street}} {{this.data.profile.address.number}} {{this.data.profile.address.bus}}</span>
                 <br/>
@@ -41,7 +42,7 @@
             <div class="col-xs-4">
                 Klant:
                 <br/>
-                <span style="font-weight: bold; font-size: large;">{{this.data.invoice.customer.name}}</span>
+                <span style="font-weight: bold; font-size: small;">{{this.data.invoice.customer.name}}</span>
                 <br/>
                 <span>{{this.data.invoice.customer.address.street}} {{this.data.invoice.customer.address.number}} {{this.data.invoice.customer.address.bus}}</span>
                 <br/>
@@ -99,9 +100,8 @@
         </div>
         <div class="row" style="position: absolute; bottom: 0; right: 0; width:100%">
             <div style="border: 1px solid black; margin-left:10px; margin-right:10px; width: 95%; padding: 5px; font-size: smaller;">
-                Wij verzoeken u vriendelijk het verschuldigde bedrag binnen 30 dagen over te maken naar IBAN {{this.data.profile.iban}}
-                <br /> ten name van {{this.data.profile.name}} te {{this.data.profile.address.place}} onder vermelding van het
-                factuurnummer.
+                Wij verzoeken u vriendelijk het verschuldigde bedrag binnen 30 dagen over te maken naar IBAN {{this.data.profile.iban}} ten name van 
+                {{this.data.profile.name}} te {{this.data.profile.address.place}} onder vermelding van het factuurnummer.
             </div>
         </div>
     </div>
