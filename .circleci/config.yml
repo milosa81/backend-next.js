@@ -34,12 +34,42 @@ jobs:
       # run tests!
       #- run: yarn test
   deploy:
+    machine:
+      enabled: true
+    working_directory: ~/repo
     steps:
       - checkout
-      - run:
-        name: Stop process
-        command: ssh $DROPLET_USER@$DROPLET_IP "pm2 stop main;"
-#      - run:
-#        name: Empty deployment folder
-#        command: ssh $DROPLET_USER@$DROPLET_IP "rm -r ~/node/dist;rm -r ~/node/dist;"
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dependencies-
+      - run: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run: npm run prestart:prod
+      - run: npm run templates:copy
+      - run: |
+          ssh $DROPLET_USER@$DROPLET_IP "pm2 stop main;
+          rm -r ~/node/dist;"
+      - run: scp -r ~/repo/dist/* $DROPLET_USER@$DROPLET_IP:~/node/dist;
+#      - checkout
+#      - run: |
+#          ssh $DROPLET_USER@$DROPLET_IP "pm2 stop main;
+#          cd ~/node;
+#          rm -r ~/dist;
+#          git pull;
+#          npm run prestart:prod;
+#          npm run templates:copy;
+#          "
+      
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
     
